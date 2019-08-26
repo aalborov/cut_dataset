@@ -17,7 +17,7 @@ def parser():
                         required=True,
                         help='Number of images in an output dataset')
     parser.add_argument('--output_archive_dir',
-                        type=str.lower, 
+                        type=str, 
                         required=True,
                         help='Full path to an output archive (without the name of the archive)')
     parser.add_argument('--dataset_type', 
