@@ -88,15 +88,16 @@ def cut_voc(output_size, output_folder_dir):
             or not os.path.isdir(images_dir)):
         sys.exit('Incorrect dataset format.')
     
-    annotations_files = os.listdir(annotation_dir)
     names = []
     files_directories = []
 
     images_files = os.listdir(images_dir)
     for images_file in images_files:
-        if images_file.lower().endswith(image_types):
-                names.append(os.path.splitext(images_file)[0])
-                files_directories.append(os.path.join(images_dir, images_file))
+        img_name = os.path.splitext(images_file)[0]
+        annotation = '{}.xml'.format(os.path.join(annotation_dir, img_name))
+        if images_file.lower().endswith(image_types) and os.path.isfile(annotation):
+            names.append(img_name)
+            files_directories.append(os.path.join(images_dir, images_file))
         if len(names) == output_size:
             break
     if not names:
