@@ -148,10 +148,7 @@ def cut_voc(output_size, output_folder_dir, first_image):
 def archive(new_file_names, source_path, output_archive_name, output_folder_dir, rel_path_finder):
     with tarfile.open(os.path.join(source_path, '{}.tar.gz'.format(output_archive_name)), 'w:gz') as tar:
         for file_name in new_file_names:
-            if os.name == 'nt':
-                relative_path = '{}'.format(file_name[file_name.find(rel_path_finder):])
-            else:
-                relative_path = '/{}'.format(file_name[file_name.find(rel_path_finder):])
+            relative_path = '{}'.format(file_name[file_name.find(rel_path_finder):])
             tar.add(os.path.join(output_folder_dir, file_name), arcname=relative_path)
 
 
