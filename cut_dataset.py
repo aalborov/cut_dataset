@@ -54,7 +54,7 @@ def cut_imagenet(output_size, output_folder_dir, first_image):
         elif file_name.lower().endswith(image_types):
             image_names.append(file_name)
     image_ext = os.path.splitext(image_names[0])[1]
-    if len(image_names) == 0:
+    if not image_names:
         sys.exit('Incorrect dataset format.')
 
     if check_subset_size(len(image_names), output_size, first_image):
