@@ -18,6 +18,7 @@ def parser():
     parser.add_argument('--first_image',
                         type=int,
                         required=False,
+                        default=0,
                         help='Number of the image to start from')
     parser.add_argument('--output_archive_dir',
                         type=str,
@@ -35,8 +36,8 @@ def unarchive(source_archive_dir, output_folder_dir):
     shutil.unpack_archive(source_archive_dir, output_folder_dir)
 
 
-def check_subset_size(dataset_size, subset_size, first_image):
-    return first_image >= dataset_size - subset_size
+def is_possible_to_cut(dataset_size, subset_size, first_image):
+    return first_image < dataset_size - subset_size
 
 
 def cut_imagenet(output_size, output_folder_dir, first_image):
@@ -57,7 +58,7 @@ def cut_imagenet(output_size, output_folder_dir, first_image):
     if not image_names:
         sys.exit('Incorrect dataset format.')
 
-    if check_subset_size(len(image_names), output_size, first_image):
+    if not is_possible_to_cut(len(image_names), output_size, first_image):
         sys.exit('Invalid --first-image value. The number of the starting image should be less than the difference '
                  'between the dataset size and the subset size.')
 
@@ -82,23 +83,23 @@ def cut_imagenet(output_size, output_folder_dir, first_image):
 
 
 def cut_voc(output_size, output_folder_dir, first_image):
-    voc_folder = os.listdir(output_folder_dir)
+    voc_folder = os.listdir(output_folder_dir)[0]
 
-    voc_year_folder_dir = os.path.join(output_folder_dir, voc_folder[0])
-    voc_year_folder = os.listdir(voc_year_folder_dir)
+    voc_year_folder_dir = os.path.join(output_folder_dir, voc_folder)
+    voc_year_folder = os.listdir(voc_year_folder_dir)[0]
 
-    voc_root_dir = os.path.join(voc_year_folder_dir, voc_year_folder[0])
-    voc_content_root = os.listdir(voc_root_dir)
+    voc_root_dir = os.path.join(voc_year_folder_dir, voc_year_folder)
+    voc_content_root_folders = os.listdir(voc_root_dir)
 
     annotation_dir = os.path.join(voc_root_dir, 'Annotations')
-    for element in voc_content_root:
+    for element in voc_content_root_folders:
         path_to_element = os.path.join(voc_root_dir, element)
         if os.path.isdir(path_to_element) and 'Images' in element:
             images_dir = path_to_element
 
-    images_files = os.listdir(images_dir)[first_image:]
+    images_files = os.listdir(images_dir)[first_image:first_image+output_size]
 
-    if check_subset_size(len(images_files), output_size, first_image):
+    if not is_possible_to_cut(len(images_files), output_size, first_image):
         sys.exit('Invalid --first-image value. The number of the starting image should be less than the difference'
                  'between the dataset and subset sizes.')
 
@@ -110,8 +111,6 @@ def cut_voc(output_size, output_folder_dir, first_image):
 
     names = []
     files_directories = []
-
-
 
     for images_file in images_files:
         img_name = os.path.splitext(images_file)[0]
@@ -163,11 +162,8 @@ def is_imagenet(dataset_type):
 if __name__ == '__main__':
     args = parser().parse_args()
 
-    if not args.first_image:
-        args.first_image = 0
-
     output_folder_dir = os.path.join(args.output_archive_dir, 'temp')
-    output_archive_name = '{}_subset_{}-{}'.format(args.dataset_type, str(args.first_image), str(args.first_image + args.output_size))
+    output_archive_name = '{}_subset_{}_{}'.format(args.dataset_type, args.first_image, args.first_image + args.output_size)
     unarchive(args.source_archive_dir, output_folder_dir)
 
     if is_imagenet(args.dataset_type):
