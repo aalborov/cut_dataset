@@ -208,8 +208,8 @@ def archive(new_file_names, source_path, output_archive_name, output_folder_dir,
             tar.add(os.path.join(output_folder_dir, file_name), arcname=relative_path)
 
 
-def clean_up(output_folder_dir):
-    shutil.rmtree(output_folder_dir)
+def clean_up(path):
+    shutil.rmtree(path)
 
 
 def is_imagenet(dataset_type):
@@ -228,7 +228,7 @@ if __name__ == '__main__':
     args = parser().parse_args()
 
     output_folder_dir = os.path.join(args.output_archive_dir, 'subset_folder')
-    output_archive_name = '{}_subset_{}_{}'.format(args.dataset_type, args.first_image, args.first_image + args.output_size)
+    output_archive_name = '{}_subset_{}_{}'.format(args.dataset_type, args.first_image, args.first_image + args.output_size - 1)
 
     if is_imagenet(args.dataset_type) and not args.source_archive_dir:
         sys.exit('--source_archive_dir is required for the selected dataset type.')
@@ -256,5 +256,4 @@ if __name__ == '__main__':
 
     archive(new_file_names, args.output_archive_dir, output_archive_name, output_folder_dir, rel_path_finder)
     clean_up(output_folder_dir)
-
 
