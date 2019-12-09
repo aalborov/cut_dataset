@@ -163,6 +163,10 @@ def cut_coco(output_size, output_folder_dir, first_image):
     images_folder = os.listdir(images_folder_dir)
     annotation_name = next(Path(annotations_folder).glob('instances_val*[0-9].json'))
     annotation_dir = os.path.join(str(annotations_folder), str(annotation_name))
+    annotation_name_train = next(Path(annotations_folder).glob('instances_train*[0-9].json'))
+    if annotation_name_train:
+        annotation_dir_train = os.path.join(str(annotations_folder), str(annotation_name_train))
+        os.remove(annotation_dir_train)
 
     if not images_folder or not annotation_name:
         sys.exit('Incorrect dataset format.')
