@@ -5,9 +5,9 @@ jobs:
       os: linux
       language: python
       python: "3.7"
-    - name: "Python 3.7 MacOS build"
+    - name: "Python 3.7.4 MacOS build"
       os: osx
       osx_image: xcode11.2
       language: shell
 script:
-  - python -m unittest discover
+  - python -m unittest discover -p "*_test.py"
