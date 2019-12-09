@@ -2,8 +2,12 @@ language: python
 python:
   - "3.6"
   - "3.7"
-os:
-  - linux
-  - osx
+jobs:
+  include:
+    - name: "Linux build"
+      os: linux
+    - name: "MacOS build"
+      os: osx
+      osx_image: xcode9.4
 script:
   - python -m unittest discover
