@@ -1,13 +1,13 @@
 language: python
-python:
-  - "3.6"
-  - "3.7"
 jobs:
   include:
-    - name: "Linux build"
+    - name: "Python 3.7 Linux build"
       os: linux
-    - name: "MacOS build"
+      language: python
+      python: "3.7"
+    - name: "Python 3.7 MacOS build"
       os: osx
-      osx_image: xcode9.4
+      osx_image: xcode11.2
+      language: shell
 script:
   - python -m unittest discover
