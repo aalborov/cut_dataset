@@ -94,9 +94,16 @@ def cut_imagenet(output_size, output_folder_dir, first_image):
 
 def cut_voc(output_size, output_folder_dir, first_image):
     voc_folder = os.listdir(output_folder_dir)[0]
+    if voc_folder == 'TrainVal':
+        voc_devkit_folder_dir = os.path.join(output_folder_dir, voc_folder)
 
-    voc_year_folder_dir = os.path.join(output_folder_dir, voc_folder)
-    voc_year_folder = os.listdir(voc_year_folder_dir)[0]
+        voc_devkit_folder = os.listdir(voc_devkit_folder_dir)[0]
+
+        voc_year_folder_dir = os.path.join(voc_devkit_folder_dir, voc_devkit_folder)
+        voc_year_folder = os.listdir(voc_year_folder_dir)[0]
+    else:
+        voc_year_folder_dir = os.path.join(output_folder_dir, voc_folder)
+        voc_year_folder = os.listdir(voc_year_folder_dir)[0]
 
     voc_root_dir = os.path.join(voc_year_folder_dir, voc_year_folder)
     voc_content_root_folders = os.listdir(voc_root_dir)
