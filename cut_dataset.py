@@ -6,6 +6,8 @@ import sys
 from pathlib import Path
 import json
 
+
+
 image_types = ('.jpg', '.jpeg', '.jpe', '.img', '.png', '.bmp')
 def parser():
     parser = argparse.ArgumentParser(description=' ')
@@ -30,10 +32,6 @@ def parser():
                         required=False,
                         default=0,
                         help='Number of the image to start from')
-    parser.add_argument('--output_archive_dir',
-                        type=str,
-                        required=True,
-                        help='Full path to the output archive (without the name of the archive)')
     parser.add_argument('--dataset_type',
                         type=str,
                         choices=['imagenet','voc', 'coco'],
@@ -209,7 +207,7 @@ def cut_coco(output_size, output_folder_dir, first_image):
 
     files_to_archive = new_image_filenames.copy()
     files_to_archive.append(annotations_folder)
-    return (files_to_archive, 'subset_folder',)
+    return files_to_archive, 'subset_folder'
 
 
 def archive(new_file_names, source_path, output_archive_name, output_folder_dir, rel_path_finder):
@@ -238,8 +236,7 @@ def is_coco(dataset_type):
 if __name__ == '__main__':
     args = parser().parse_args()
 
-    output_folder_dir = os.path.join(args.output_archive_dir, 'subset_folder')
-    output_archive_name = '{}_subset_{}_{}'.format(args.dataset_type, args.first_image, args.first_image + args.output_size - 1)
+    current_dir = os.getcwd()
 
     if is_imagenet(args.dataset_type) and not args.source_archive_dir:
         sys.exit('--source_archive_dir is required for the selected dataset type.')
@@ -248,23 +245,34 @@ if __name__ == '__main__':
     if is_coco(args.dataset_type) and (not args.source_images_archive_dir or not args.source_annotations_archive_dir):
         sys.exit('Both --source_images_archive_dir and --source_annotations_archive_dir are required for the selected dataset type.')
 
+    if is_imagenet(args.dataset_type) or is_voc(args.dataset_type):
+        source_archive_directory = os.path.join(current_dir, args.source_archive_dir)
+    else:
+        source_images_archive_directory = os.path.join(current_dir, args.source_images_archive_dir)
+        source_annotations_archive_directory = os.path.join(current_dir, args.source_annotations_archive_dir)
+
+    output_folder_dir = os.path.join(os.path.join(current_dir, 'subset_folder'))
+    output_archive_name = '{}_subset_{}_{}'.format(args.dataset_type, args.first_image, args.first_image + args.output_size - 1)
+
     if is_imagenet(args.dataset_type):
-        unarchive(args.source_archive_dir, output_folder_dir)
+        unarchive(source_archive_directory, output_folder_dir)
         imagenet_data = cut_imagenet(args.output_size, output_folder_dir, args.first_image)
         new_file_names = imagenet_data[0]
         rel_path_finder = imagenet_data[1]
     elif is_voc(args.dataset_type):
-        unarchive(args.source_archive_dir, output_folder_dir)
+        unarchive(source_archive_directory, output_folder_dir)
         voc_data = cut_voc(args.output_size, output_folder_dir, args.first_image)
         new_file_names = voc_data[0]
         rel_path_finder = voc_data[1]
     else:
-        unarchive(args.source_images_archive_dir, output_folder_dir)
-        unarchive(args.source_annotations_archive_dir, output_folder_dir)
+        unarchive(source_images_archive_directory, output_folder_dir)
+        unarchive(source_annotations_archive_directory, output_folder_dir)
         coco_data = cut_coco(args.output_size, output_folder_dir, args.first_image)
         new_file_names = coco_data[0]
         rel_path_finder = coco_data[1]
 
-    archive(new_file_names, args.output_archive_dir, output_archive_name, output_folder_dir, rel_path_finder)
+    archive(new_file_names, current_dir, output_archive_name, output_folder_dir, rel_path_finder)
+    print('Find your subset {}.tar.gz at {}'.format(output_archive_name, output_folder_dir))
     clean_up(output_folder_dir)
+
 
