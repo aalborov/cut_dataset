@@ -6,9 +6,9 @@ import sys
 from pathlib import Path
 import json
 
-
-
 image_types = ('.jpg', '.jpeg', '.jpe', '.img', '.png', '.bmp')
+
+
 def parser():
     parser = argparse.ArgumentParser(description=' ')
     parser.add_argument('--source_archive_dir',
@@ -274,5 +274,3 @@ if __name__ == '__main__':
     archive(new_file_names, current_dir, output_archive_name, output_folder_dir, rel_path_finder)
     print('Find your subset {}.tar.gz at {}'.format(output_archive_name, output_folder_dir))
     clean_up(output_folder_dir)
-
-
